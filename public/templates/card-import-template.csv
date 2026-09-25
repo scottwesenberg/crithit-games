@@ -1,0 +1,4 @@
+game,set,promo,name,collector_number,rarity,card_type,sub_type,description,image_url,finish,condition,language,price,quantity,sku
+Magic: The Gathering,Bloomburrow,FALSE,Sunshower Druid,142,Uncommon,Creature,Otter Druid,"When Sunshower Druid enters the battlefield, target creature gets +1/+1.",https://example.com/images/sunshower-druid.jpg,Normal,NM,English,0.35,12,
+Magic: The Gathering,Bloomburrow,FALSE,Sunshower Druid,142,Uncommon,Creature,Otter Druid,"When Sunshower Druid enters the battlefield, target creature gets +1/+1.",https://example.com/images/sunshower-druid.jpg,Foil,NM,English,0.99,4,
+Pokemon,2026 Black Star Promos,TRUE,Pikachu,SWSH301,Promo,Pokemon,Basic,A special promo Pikachu.,https://example.com/images/pikachu-promo.jpg,Holofoil,NM,English,4.5,6,

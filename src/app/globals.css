@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-[#f7f6fb] text-ink-950 antialiased;
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.card-surface {
+  @apply rounded-xl border border-black/5 bg-white shadow-card;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.btn-primary {
+  @apply btn bg-brand-600 text-white hover:bg-brand-700;
+}
+
+.btn-secondary {
+  @apply btn bg-white text-ink-900 ring-1 ring-inset ring-black/10 hover:bg-black/5;
+}
+
+.btn-ghost {
+  @apply btn text-ink-900 hover:bg-black/5;
+}
+
+.input {
+  @apply w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-black/40 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200;
+}
+
+.label {
+  @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-700/70;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.hero-fan-card {
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.25s ease;
+}
+
+.hero-fan-card:hover {
+  transform: rotate(var(--tilt, 0deg)) translateY(-0.875em) scale(1.05);
+  z-index: 30 !important;
+}

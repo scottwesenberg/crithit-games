@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CritHit Games mark">
+  <defs>
+    <linearGradient id="chg-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6c37ff"/>
+      <stop offset="1" stop-color="#341582"/>
+    </linearGradient>
+    <linearGradient id="chg-bolt" x1="20" y1="10" x2="44" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd58a"/>
+      <stop offset="1" stop-color="#ff9d1f"/>
+    </linearGradient>
+  </defs>
+  <!-- hexagonal die facet -->
+  <path d="M32 2 L59 17.5 V46.5 L32 62 L5 46.5 V17.5 Z" fill="url(#chg-bg)"/>
+  <path d="M32 2 L59 17.5 V46.5 L32 62 L5 46.5 V17.5 Z" fill="none" stroke="#241157" stroke-width="1.5"/>
+  <!-- inner facet lines for a die feel -->
+  <path d="M32 2 V62 M5 17.5 L32 33 L59 17.5 M5 46.5 L32 33" stroke="#ffffff" stroke-opacity="0.14" stroke-width="1.4" fill="none"/>
+  <!-- crit-hit spark -->
+  <path d="M35.5 10 L21 34 H30.5 L26 54 L46 27.5 H35 Z" fill="url(#chg-bolt)" stroke="#8a3e00" stroke-opacity="0.25" stroke-width="1"/>
+</svg>

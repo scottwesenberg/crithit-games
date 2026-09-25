@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CritHit Games">
+  <defs>
+    <linearGradient id="f-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6c37ff"/>
+      <stop offset="1" stop-color="#341582"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 2 L59 17.5 V46.5 L32 62 L5 46.5 V17.5 Z" fill="url(#f-bg)"/>
+  <path d="M35.5 10 L21 34 H30.5 L26 54 L46 27.5 H35 Z" fill="#ffb44d"/>
+</svg>

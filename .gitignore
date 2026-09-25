@@ -1,0 +1,14 @@
+node_modules
+.next
+.env
+.env.local
+npm-debug.log*
+.DS_Store
+/prisma/dev.db
+/prisma/dev.db-journal
+next-env.d.ts
+.vercel
+
+# TypeScript build info / scratch
+*.tsbuildinfo
+_to_delete/

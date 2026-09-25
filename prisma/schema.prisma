@@ -1,0 +1,255 @@
+// CritHit Games — data model
+// Run `npm run db:migrate` after setting DATABASE_URL to apply this schema.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Accounts ----------
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  passwordHash    String
+  role            Role      @default(USER)
+  emailVerified   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  addresses       Address[]
+  orders          Order[]
+  verificationTokens EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+  csvImportBatches CsvImportBatch[]
+}
+
+model Address {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String   @default("Home")
+  fullName    String
+  line1       String
+  line2       String?
+  city        String
+  state       String
+  postalCode  String
+  country     String   @default("US")
+  phone       String?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  orders      Order[]
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires   DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ---------- Catalog ----------
+// A Game is a product line (Magic: the Gathering, Pokemon, Yu-Gi-Oh!, ...).
+// A CardSet belongs to a Game. Promo releases are modeled as a CardSet with
+// isPromo = true, exactly like "SWSH Black Star Promos" is its own set on
+// real singles sites — promo cards are still "part of a set".
+// A Card belongs to a CardSet. Each Card can have many purchasable
+// CardVariants (a finish/condition/language combination with its own price
+// and stock), because the same card is sold at different prices depending
+// on whether it's Near Mint vs Played, foil vs non-foil, etc.
+
+model Game {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  iconUrl     String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  sets        CardSet[]
+}
+
+model CardSet {
+  id          String   @id @default(cuid())
+  gameId      String
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String
+  code        String?
+  releaseDate DateTime?
+  iconUrl     String?
+  isPromo     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  cards       Card[]
+
+  @@unique([gameId, slug])
+  @@index([gameId])
+}
+
+model Card {
+  id               String   @id @default(cuid())
+  setId            String
+  set              CardSet  @relation(fields: [setId], references: [id], onDelete: Cascade)
+  name             String
+  slug             String
+  collectorNumber  String?
+  rarity           String?
+  cardType         String?
+  subType          String?
+  description      String?
+  imageUrl         String?
+  // Free-form, game-specific attributes (mana cost, HP, energy type, illustrator, etc.)
+  // Stored as JSON so the same schema works across every game without a
+  // wide sparse column list.
+  attributes       Json?
+  isPromo          Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  variants         CardVariant[]
+
+  @@unique([setId, slug])
+  @@index([setId])
+  @@index([name])
+}
+
+enum Condition {
+  NEAR_MINT
+  LIGHTLY_PLAYED
+  MODERATELY_PLAYED
+  HEAVILY_PLAYED
+  DAMAGED
+}
+
+model CardVariant {
+  id          String    @id @default(cuid())
+  cardId      String
+  card        Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  // e.g. "Normal", "Foil", "Holofoil", "Reverse Holo", "1st Edition"
+  finish      String    @default("Normal")
+  condition   Condition @default(NEAR_MINT)
+  language    String    @default("English")
+  sku         String    @unique
+  priceCents  Int
+  quantity    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  orderItems  OrderItem[]
+
+  @@unique([cardId, finish, condition, language])
+  @@index([cardId])
+}
+
+// ---------- Orders ----------
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  FULFILLED
+  CANCELED
+  REFUNDED
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  orderNumber           String      @unique
+  userId                String?
+  user                  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestEmail            String?
+  status                OrderStatus @default(PENDING_PAYMENT)
+
+  addressId             String?
+  shippingAddress       Address?    @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  shippingAddressSnapshot Json?
+
+  subtotalCents         Int
+  shippingCents         Int         @default(0)
+  taxCents               Int        @default(0)
+  totalCents             Int
+
+  stripeCheckoutSessionId String?   @unique
+  stripePaymentIntentId   String?
+
+  createdAt              DateTime  @default(now())
+  updatedAt               DateTime @updatedAt
+
+  items                  OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id              String      @id @default(cuid())
+  orderId         String
+  order           Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  cardVariantId   String?
+  cardVariant     CardVariant? @relation(fields: [cardVariantId], references: [id], onDelete: SetNull)
+
+  // Snapshots so historical orders still read correctly even if the
+  // underlying card/variant is later edited or removed.
+  cardName        String
+  setName         String
+  finish          String
+  condition       Condition
+  unitPriceCents  Int
+  quantity        Int
+
+  @@index([orderId])
+}
+
+// ---------- Admin tooling ----------
+
+enum ImportStatus {
+  PROCESSING
+  COMPLETED
+  COMPLETED_WITH_ERRORS
+  FAILED
+}
+
+model CsvImportBatch {
+  id            String       @id @default(cuid())
+  adminUserId   String
+  adminUser     User         @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  filename      String
+  status        ImportStatus @default(PROCESSING)
+  totalRows     Int          @default(0)
+  successRows   Int          @default(0)
+  errorRows     Int          @default(0)
+  errorLog      Json?
+  createdAt     DateTime     @default(now())
+
+  @@index([adminUserId])
+}
