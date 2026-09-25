@@ -84,7 +84,7 @@ async function main() {
       emailVerified: new Date(),
     },
   });
-  console.log(`Admin: ${admin.email} / ${adminPassword}`);
+  console.log(`Admin: ${admin.email} (password from SEED_ADMIN_PASSWORD, not shown)`);
 
   const demoPassword = "DemoPass123!";
   const demo = await prisma.user.upsert({
