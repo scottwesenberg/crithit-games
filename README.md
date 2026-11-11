@@ -6,7 +6,7 @@
 
 A full-stack trading card singles & sealed product storefront, modeled on the structure of independent card shops
 like GameNerdz.com, built with Next.js, Prisma/PostgreSQL, NextAuth, and Stripe. It is a **portfolio project**, not a
-real retailer: payments run in Stripe test mode and nothing ships.
+real retailer. Stripe Checkout is fully wired up but switched off on the live demo (no payment account is connected), so you can browse, search, filter, build a cart, register, and use the admin tools, but not pay. Run it locally with Stripe test keys to see the full checkout flow.
 
 The catalog holds roughly 5,000 real cards across Magic: The Gathering, Pokémon, Yu-Gi-Oh!, Disney Lorcana, and
 One Piece, covering every set from the last ten years, pulled from public community APIs (Scryfall, Pokémon TCG
@@ -29,7 +29,7 @@ API, YGOPRODeck, Lorcast, OPTCG API) with prices taken from those sources.
 ## Demo mode & security notes
 
 - **Demo banner and disclaimer.** A banner and footer note make clear this is a demo and not affiliated with any card
-  publisher. Hide the banner with `NEXT_PUBLIC_DEMO_BANNER=false`.
+  publisher. Without Stripe keys, checkout returns a friendly "turned off in this demo" message. Hide the banner with `NEXT_PUBLIC_DEMO_BANNER=false`.
 - **Email.** If no SMTP credentials are configured, the app runs in demo mode: no emails are sent and new accounts are
   verified immediately. Set the `EMAIL_SERVER_*` variables to switch on real verification and reset emails.
 - **No seeded accounts in production.** The demo customer is created only in local development; production seeding

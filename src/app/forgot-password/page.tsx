@@ -5,16 +5,19 @@ import { useState } from "react";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [emailDisabled, setEmailDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await fetch("/api/auth/forgot-password", {
+    const res = await fetch("/api/auth/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
+    const data = await res.json().catch(() => ({}));
+    setEmailDisabled(Boolean(data.emailDisabled));
     setLoading(false);
     setSent(true);
   }
@@ -25,7 +28,9 @@ export default function ForgotPasswordPage() {
         <h1 className="mb-4 text-xl font-extrabold">Reset your password</h1>
         {sent ? (
           <p className="text-sm text-black/60">
-            If an account exists for {email}, a reset link is on its way.
+            {emailDisabled
+              ? "Password reset by email is turned off in this demo because it has no email service connected. Just create a new demo account instead."
+              : `If an account exists for ${email}, a reset link is on its way.`}
           </p>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">

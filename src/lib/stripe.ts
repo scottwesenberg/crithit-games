@@ -8,6 +8,11 @@ if (!secretKey) {
   );
 }
 
+/** True only when STRIPE_SECRET_KEY looks like a real Stripe key (not unset or an example placeholder). */
+export function isStripeConfigured() {
+  return /^sk_(test|live)_[A-Za-z0-9]{10,}$/.test(process.env.STRIPE_SECRET_KEY ?? "");
+}
+
 export const stripe = new Stripe(secretKey ?? "sk_test_placeholder", {
   apiVersion: "2024-06-20",
 });

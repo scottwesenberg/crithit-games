@@ -1,9 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // The site renders card art with plain <img> tags and never uses next/image, so the built-in image
+  // optimizer is switched off and allows no remote hosts (several Next.js advisories target that endpoint).
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "**" },
-    ],
+    unoptimized: true,
+    remotePatterns: [],
   },
   eslint: {
     ignoreDuringBuilds: true,

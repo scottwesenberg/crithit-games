@@ -4,7 +4,7 @@ import type Stripe from "stripe";
 import type { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { isStripeConfigured, stripe } from "@/lib/stripe";
 import { checkoutSchema } from "@/lib/validations";
 import { conditionLabel } from "@/lib/constants";
 import { generateOrderNumber } from "@/lib/utils";
@@ -13,6 +13,13 @@ import { clientIp, rateLimit, tooManyRequests } from "@/lib/rateLimit";
 export async function POST(req: Request) {
   const gate = rateLimit(`checkout:${clientIp(req.headers)}`, 20, 10 * 60_000);
   if (!gate.ok) return tooManyRequests(gate.retryAfterSeconds);
+
+  if (!isStripeConfigured()) {
+    return NextResponse.json(
+      { error: "Checkout is turned off in this demo because no payment processor is connected. Everything else works: browsing, search, filters, cart, accounts, and the admin tools." },
+      { status: 503 }
+    );
+  }
 
   const body = await req.json().catch(() => null);
   const parsed = checkoutSchema.safeParse(body);

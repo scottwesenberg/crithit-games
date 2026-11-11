@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createToken, tokenExpiry } from "@/lib/tokens";
-import { sendPasswordResetEmail } from "@/lib/mailer";
+import { isEmailConfigured, sendPasswordResetEmail } from "@/lib/mailer";
 import { clientIp, rateLimit, tooManyRequests } from "@/lib/rateLimit";
 
 const schema = z.object({ email: z.string().email() });
@@ -10,6 +10,9 @@ const schema = z.object({ email: z.string().email() });
 export async function POST(req: Request) {
   const gate = rateLimit(`forgot:${clientIp(req.headers)}`, 5, 60 * 60_000);
   if (!gate.ok) return tooManyRequests(gate.retryAfterSeconds);
+
+  // Demo mode: no way to deliver a reset link, so say so instead of pretending an email was sent.
+  if (!isEmailConfigured()) return NextResponse.json({ ok: true, emailDisabled: true });
 
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
