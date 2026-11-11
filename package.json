@@ -15,7 +15,8 @@
     "postinstall": "prisma generate",
     "db:import-real": "tsx scripts/import-real-catalog.ts",
     "db:set-admin-password": "tsx scripts/set-admin-password.ts",
-    "db:snapshot": "docker compose exec -T db pg_dump -U crithit -d crithit --data-only --disable-triggers --no-owner --no-privileges > prisma/catalog-snapshot.sql",
+    "db:remove-demo": "tsx scripts/remove-demo-data.ts",
+    "db:snapshot": "docker compose exec -T db pg_dump -U crithit -d crithit --data-only --disable-triggers --no-owner --no-privileges > prisma/catalog-snapshot.sql && node scripts/strip-snapshot.mjs",
     "db:restore": "docker compose exec -T db psql -U crithit -d crithit -v ON_ERROR_STOP=1 < prisma/catalog-snapshot.sql"
   },
   "prisma": {

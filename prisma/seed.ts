@@ -71,7 +71,11 @@ async function main() {
 
   // ---- Admin + demo customer ----
   const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? "admin@crithitgames.com").toLowerCase();
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe123!";
+  const isProduction = process.env.NODE_ENV === "production";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "ChangeMe123!";
+  if (isProduction && (adminPassword === "ChangeMe123!" || adminPassword.length < 12)) {
+    throw new Error("Refusing to seed in production: set SEED_ADMIN_PASSWORD to a unique password of 12+ characters.");
+  }
 
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
@@ -86,8 +90,9 @@ async function main() {
   });
   console.log(`Admin: ${admin.email} (password from SEED_ADMIN_PASSWORD, not shown)`);
 
+  // Demo customer (known password, fake address/order) exists for local development only -- never in production.
   const demoPassword = "DemoPass123!";
-  const demo = await prisma.user.upsert({
+  const demo = isProduction ? null : await prisma.user.upsert({
     where: { email: "demo@crithitgames.com" },
     update: {},
     create: {
@@ -98,9 +103,9 @@ async function main() {
       emailVerified: new Date(),
     },
   });
-  console.log(`Demo customer: ${demo.email} / ${demoPassword}`);
+  if (demo) console.log(`Demo customer (local dev only): ${demo.email}`);
 
-  await prisma.address.upsert({
+  if (demo) await prisma.address.upsert({
     where: { id: "seed-demo-address" },
     update: {},
     create: {
@@ -239,7 +244,7 @@ async function main() {
   }
 
   // ---- Sample paid order for the demo customer ----
-  if (firstOrderVariant) {
+  if (demo && firstOrderVariant) {
     const existingOrder = await prisma.order.findUnique({ where: { orderNumber: "CHG-SEED-0001" } });
     if (!existingOrder) {
       await prisma.order.create({

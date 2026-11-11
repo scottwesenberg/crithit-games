@@ -26,10 +26,6 @@ SET SESSION AUTHORIZATION DEFAULT;
 
 ALTER TABLE public."User" DISABLE TRIGGER ALL;
 
-COPY public."User" (id, name, email, "passwordHash", role, "emailVerified", "createdAt", "updatedAt") FROM stdin;
-cmu6c658w0000iw4nrp5sazxc	Store Admin	admin@crithitgames.com	$2a$12$Teg3h.YKH28S1LJN7SuoMOf2dDWZwxqfVXmiqGuYOx0cbodz9J.3y	ADMIN	2026-09-18 02:25:19.363	2026-09-18 02:25:19.377	2026-09-18 02:25:19.377
-cmu6c65ee0001iw4nxe6x8gmw	Demo Customer	demo@crithitgames.com	$2a$12$r6JP6xed6SKJPS7GLh4GNuIl1BNOPpqRwW4.lHEc2DfV2o8Dn4Fvm	USER	2026-09-18 02:25:19.572	2026-09-18 02:25:19.574	2026-09-18 02:25:19.574
-\.
 
 
 ALTER TABLE public."User" ENABLE TRIGGER ALL;
@@ -40,9 +36,6 @@ ALTER TABLE public."User" ENABLE TRIGGER ALL;
 
 ALTER TABLE public."Address" DISABLE TRIGGER ALL;
 
-COPY public."Address" (id, "userId", label, "fullName", line1, line2, city, state, "postalCode", country, phone, "isDefault", "createdAt") FROM stdin;
-seed-demo-address	cmu6c65ee0001iw4nxe6x8gmw	Home	Demo Customer	123 Playtest Ave	\N	Columbus	OH	43215	US	\N	t	2026-09-18 02:25:19.578
-\.
 
 
 ALTER TABLE public."Address" ENABLE TRIGGER ALL;
@@ -16221,8 +16214,6 @@ ALTER TABLE public."CardVariant" ENABLE TRIGGER ALL;
 
 ALTER TABLE public."CsvImportBatch" DISABLE TRIGGER ALL;
 
-COPY public."CsvImportBatch" (id, "adminUserId", filename, status, "totalRows", "successRows", "errorRows", "errorLog", "createdAt") FROM stdin;
-\.
 
 
 ALTER TABLE public."CsvImportBatch" ENABLE TRIGGER ALL;
@@ -16233,8 +16224,6 @@ ALTER TABLE public."CsvImportBatch" ENABLE TRIGGER ALL;
 
 ALTER TABLE public."EmailVerificationToken" DISABLE TRIGGER ALL;
 
-COPY public."EmailVerificationToken" (id, token, "userId", expires, "createdAt") FROM stdin;
-\.
 
 
 ALTER TABLE public."EmailVerificationToken" ENABLE TRIGGER ALL;
@@ -16245,9 +16234,6 @@ ALTER TABLE public."EmailVerificationToken" ENABLE TRIGGER ALL;
 
 ALTER TABLE public."Order" DISABLE TRIGGER ALL;
 
-COPY public."Order" (id, "orderNumber", "userId", "guestEmail", status, "addressId", "shippingAddressSnapshot", "subtotalCents", "shippingCents", "taxCents", "totalCents", "stripeCheckoutSessionId", "stripePaymentIntentId", "createdAt", "updatedAt") FROM stdin;
-cmu6c66ib00tjiw4n9alqobl3	CHG-SEED-0001	cmu6c65ee0001iw4nxe6x8gmw	\N	FULFILLED	\N	{"name": "Demo Customer", "address": {"city": "Columbus", "line1": "123 Playtest Ave", "state": "OH", "country": "US", "postal_code": "43215"}}	50	499	4	553	\N	\N	2026-09-18 02:25:21.011	2026-09-18 02:25:21.011
-\.
 
 
 ALTER TABLE public."Order" ENABLE TRIGGER ALL;
@@ -16258,9 +16244,6 @@ ALTER TABLE public."Order" ENABLE TRIGGER ALL;
 
 ALTER TABLE public."OrderItem" DISABLE TRIGGER ALL;
 
-COPY public."OrderItem" (id, "orderId", "cardVariantId", "cardName", "setName", finish, condition, "unitPriceCents", quantity) FROM stdin;
-cmu6c66ib00tliw4n6dbd4wi7	cmu6c66ib00tjiw4n9alqobl3	\N	Ember Sentinel	Magic Core Set	Normal	NEAR_MINT	25	2
-\.
 
 
 ALTER TABLE public."OrderItem" ENABLE TRIGGER ALL;
@@ -16271,8 +16254,6 @@ ALTER TABLE public."OrderItem" ENABLE TRIGGER ALL;
 
 ALTER TABLE public."PasswordResetToken" DISABLE TRIGGER ALL;
 
-COPY public."PasswordResetToken" (id, token, "userId", expires, "usedAt", "createdAt") FROM stdin;
-\.
 
 
 ALTER TABLE public."PasswordResetToken" ENABLE TRIGGER ALL;
@@ -16283,9 +16264,6 @@ ALTER TABLE public."PasswordResetToken" ENABLE TRIGGER ALL;
 
 ALTER TABLE public._prisma_migrations DISABLE TRIGGER ALL;
 
-COPY public._prisma_migrations (id, checksum, finished_at, migration_name, logs, rolled_back_at, started_at, applied_steps_count) FROM stdin;
-6179c5d2-fc54-464a-bded-ab98f0fd5e3b	8cbbd795cd446d9515e0961323adb19290d247b94c5ed70e64a86c41bccf5111	2026-09-18 02:24:58.136032+00	20260918022458_initial_migration	\N	\N	2026-09-18 02:24:58.053557+00	1
-\.
 
 
 ALTER TABLE public._prisma_migrations ENABLE TRIGGER ALL;

@@ -1,7 +1,8 @@
 node_modules
 .next
 .env
-.env.local
+.env.*
+!.env.example
 npm-debug.log*
 .DS_Store
 /prisma/dev.db
@@ -12,3 +13,13 @@ next-env.d.ts
 # TypeScript build info / scratch
 *.tsbuildinfo
 _to_delete/
+
+# Secrets, key material and raw database dumps (only the stripped catalog snapshot is tracked)
+*.pem
+*.key
+*.log
+*.zip
+*.dump
+*.bak
+prisma/*.sql
+!prisma/catalog-snapshot.sql

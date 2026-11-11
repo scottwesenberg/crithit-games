@@ -47,10 +47,11 @@ npm run db:seed
 npm run dev
 ```
 
-Visit `http://localhost:3000`. The seed script prints an admin login (`admin@crithitgames.com` by default —
-set `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env` to change it) and a demo customer login
-(`demo@crithitgames.com` / `DemoPass123!`) that already has a saved address and one past order, so you can see
-the order-history page without checking out first.
+Visit `http://localhost:3000`. Set `SEED_ADMIN_EMAIL` and a unique `SEED_ADMIN_PASSWORD` (12+ characters) in
+`.env` before seeding; the seed creates that admin account. In local development it also creates a
+`demo@crithitgames.com` customer (with a fake address and one past order) so you can see the order-history page;
+that demo account is **never created when `NODE_ENV=production`**, and `npm run db:remove-demo` deletes it (and its
+sample order) from any database you point `DATABASE_URL` at.
 
 ## Environment variables
 
