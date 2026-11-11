@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { assertAdmin } from "@/lib/adminGuard";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await assertAdmin();
   return (
     <div className="container-page grid gap-8 py-10 lg:grid-cols-[220px_1fr]">
       <aside className="card-surface h-fit p-4">

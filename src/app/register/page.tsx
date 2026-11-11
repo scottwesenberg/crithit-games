@@ -7,6 +7,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [autoVerified, setAutoVerified] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -21,6 +22,7 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Something went wrong");
+      setAutoVerified(Boolean(data.autoVerified));
       setDone(true);
     } catch (e: any) {
       setError(e.message);
@@ -32,9 +34,11 @@ export default function RegisterPage() {
   if (done) {
     return (
       <div className="container-page flex flex-col items-center gap-4 py-24 text-center">
-        <h1 className="text-2xl font-extrabold">Check your inbox</h1>
+        <h1 className="text-2xl font-extrabold">{autoVerified ? "Account created" : "Check your inbox"}</h1>
         <p className="max-w-sm text-black/60">
-          We sent a verification link to {form.email}. Click it to activate your account before signing in.
+          {autoVerified
+            ? "This is a demo store, so email verification is turned off. You can sign in right away."
+            : `We sent a verification link to ${form.email}. Click it to activate your account before signing in.`}
         </p>
         <Link href="/login" className="btn-primary">Go to sign in</Link>
       </div>

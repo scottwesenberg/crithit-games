@@ -1,9 +1,11 @@
+import { assertAdmin } from "@/lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import CardForm from "@/components/admin/CardForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewCardPage() {
+  await assertAdmin();
   const games = await prisma.game.findMany({
     orderBy: { sortOrder: "asc" },
     include: { sets: { orderBy: [{ isPromo: "asc" }, { name: "asc" }], select: { id: true, name: true, isPromo: true } } },

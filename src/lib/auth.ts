@@ -2,6 +2,7 @@ import { type AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { clientIp, rateLimit, resetRateLimit } from "@/lib/rateLimit";
 
 export const authOptions: AuthOptions = {
   session: { strategy: "jwt" },
@@ -15,27 +16,36 @@ export const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Email and password are required.");
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase().trim() },
-        });
-
-        if (!user) {
-          throw new Error("No account found with that email.");
+        // Throttle guessing: per client IP, and per account regardless of IP.
+        const email = credentials.email.toLowerCase().trim();
+        const ip = clientIp(req?.headers as Record<string, string | string[] | undefined> | undefined);
+        const ipGate = rateLimit(`login:ip:${ip}`, 30, 15 * 60_000);
+        const acctGate = rateLimit(`login:acct:${email}`, 10, 15 * 60_000);
+        if (!ipGate.ok || !acctGate.ok) {
+          throw new Error("Too many sign-in attempts. Please wait a few minutes and try again.");
         }
 
-        const valid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!valid) {
-          throw new Error("Incorrect password.");
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        // One generic message for "no such account" and "wrong password" so the form can't be used
+        // to discover which emails are registered.
+        const valid = user ? await bcrypt.compare(credentials.password, user.passwordHash) : false;
+        if (!user || !valid) {
+          throw new Error("Invalid email or password.");
         }
 
         if (!user.emailVerified) {
           throw new Error("Please verify your email before signing in.");
         }
+
+        resetRateLimit(`login:acct:${email}`);
 
         return {
           id: user.id,

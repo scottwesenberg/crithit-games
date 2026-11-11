@@ -1,18 +1,46 @@
 # CritHit Games
 
-A full-stack trading card singles & sealed product storefront built with Next.js, Prisma/PostgreSQL, NextAuth, and Stripe.
+[![CI](https://github.com/scottwesenberg/crithit-games/actions/workflows/ci.yml/badge.svg)](https://github.com/scottwesenberg/crithit-games/actions/workflows/ci.yml)
 
-Card catalog is organized as **Game → Set → Card → Variant**. A "promo" drop (e.g. prerelease promos, Black
-Star Promos) is modeled the same way real singles sites do it: it's just a `CardSet` flagged `isPromo`, so
-promo cards live in a set and are filterable exactly like any other set. Each `Card` can have multiple
-purchasable `CardVariant`s — one row per finish × condition × language — each with its own price and stock,
-which is how the same card ends up with several prices (Near Mint foil vs. Lightly Played non-foil, etc.).
+**Live demo: https://crithit-games.vercel.app/**
 
-## About this project
+A full-stack trading card singles & sealed product storefront, modeled on the structure of independent card shops
+like GameNerdz.com, built with Next.js, Prisma/PostgreSQL, NextAuth, and Stripe. It is a **portfolio project**, not a
+real retailer: payments run in Stripe test mode and nothing ships.
 
-CritHit Games is a portfolio project built by Scott Wesenberg ([Mitten Web Works](https://mittenwebworks.com)).
-It is a working demo, not a live store: no real customers, orders, or payment data are stored, and checkout runs
-in Stripe test mode only. The demo accounts and sample data in this repo are placeholders.
+The catalog holds roughly 5,000 real cards across Magic: The Gathering, Pokémon, Yu-Gi-Oh!, Disney Lorcana, and
+One Piece, covering every set from the last ten years, pulled from public community APIs (Scryfall, Pokémon TCG
+API, YGOPRODeck, Lorcast, OPTCG API) with prices taken from those sources.
+
+## What to look at
+
+- **Catalog architecture** — Game → Set → Card → Variant (finish × condition × language, each with its own price and stock).
+  Promo drops are just sets flagged `isPromo`. Filtering, sorting, and pagination live in `src/lib/catalog.ts`.
+- **Checkout** — cart in the browser, Stripe Checkout, server-side price/stock revalidation, and a signature-verified
+  webhook that marks orders paid and decrements stock.
+- **Auth & roles** — NextAuth credentials with bcrypt, email verification, password reset, and `USER` / `ADMIN` roles
+  enforced in middleware, in server pages, and in every admin API route.
+- **Admin tools** — add/edit cards, CSV bulk import, sets and promos, order management.
+- **Data pipeline** — `scripts/import-real-catalog.ts` imports real card data per game with per-game error isolation and
+  a frozen catalog snapshot (`npm run db:snapshot` / `db:restore`) so the APIs are only hit once.
+- **Responsive homepage** — a random high-value Pokémon card fan that scales with screen size, plus a linked
+  marquee of big hits from every game.
+
+## Demo mode & security notes
+
+- **Demo banner and disclaimer.** A banner and footer note make clear this is a demo and not affiliated with any card
+  publisher. Hide the banner with `NEXT_PUBLIC_DEMO_BANNER=false`.
+- **Email.** If no SMTP credentials are configured, the app runs in demo mode: no emails are sent and new accounts are
+  verified immediately. Set the `EMAIL_SERVER_*` variables to switch on real verification and reset emails.
+- **No seeded accounts in production.** The demo customer is created only in local development; production seeding
+  requires a unique `SEED_ADMIN_PASSWORD`. `npm run db:remove-demo` removes demo data from any database.
+- **Rate limiting** on sign-in, registration, password reset, and checkout (`src/lib/rateLimit.ts`). It is in-memory
+  per serverless instance, which slows abuse but is not a global cap; a real deployment should use a shared store such
+  as Upstash Redis.
+- **Security headers**, generic login errors (no account enumeration), and server-side admin checks that don't depend on
+  middleware alone.
+- **The committed catalog snapshot contains no user data.** `scripts/strip-snapshot.mjs` removes account, address, order,
+  and token tables from it automatically.
 
 ## Tech stack
 
@@ -58,7 +86,7 @@ sample order) from any database you point `DATABASE_URL` at.
 See `.env.example` for the full list with comments. You'll need:
 
 - `DATABASE_URL` — Postgres connection string.
-- `NEXTAUTH_SECRET` — random 32-byte secret (`openssl rand -base64 32`).
+- `NEXTAUTH_SECRET` — random 32-byte secret (`openssl rand -base64 32`). Use a unique value per environment; never reuse a value from docs or examples.
 - `APP_URL` / `NEXTAUTH_URL` — the site's base URL (`http://localhost:3000` locally).
 - `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` — from the
   [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys) (test mode keys to start).
@@ -210,8 +238,7 @@ Brand colors live in `tailwind.config.ts` under `brand` (indigo/violet) and `emb
 
 ## Troubleshooting
 
-Since this codebase couldn't be compiled in the environment it was written in, here's what to check if
-`npm run build` turns up something:
+If `npm run build` turns up something, here's what to check:
 
 - **Prisma client types out of date** — run `npm run db:generate` (or just `npm install`, which runs it via
   `postinstall`) after any `schema.prisma` change.
@@ -228,5 +255,5 @@ Since this codebase couldn't be compiled in the environment it was written in, h
 - Guest order lookup by order number + email (orders are already tracked with `guestEmail`, just no lookup UI yet).
 - Wishlists / saved searches.
 - A "sell to us" buylist flow, if you want to mirror that side of GameNerdz too.
-- Real card images — `Card.imageUrl` and `CardVariant` are ready for them; seed data ships without images to
-  avoid using anyone else's card art.
+- Shared rate-limit store (Redis) and a hosted email provider for production use.
+- Automated tests for checkout and the webhook.

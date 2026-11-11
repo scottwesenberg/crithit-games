@@ -8,8 +8,12 @@ import { stripe } from "@/lib/stripe";
 import { checkoutSchema } from "@/lib/validations";
 import { conditionLabel } from "@/lib/constants";
 import { generateOrderNumber } from "@/lib/utils";
+import { clientIp, rateLimit, tooManyRequests } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
+  const gate = rateLimit(`checkout:${clientIp(req.headers)}`, 20, 10 * 60_000);
+  if (!gate.ok) return tooManyRequests(gate.retryAfterSeconds);
+
   const body = await req.json().catch(() => null);
   const parsed = checkoutSchema.safeParse(body);
   if (!parsed.success) {

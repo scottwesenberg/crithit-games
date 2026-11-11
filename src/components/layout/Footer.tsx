@@ -32,12 +32,18 @@ export default function Footer() {
           <h3 className="mb-3 text-sm font-semibold text-white">Support</h3>
           <ul className="space-y-2 text-sm">
             <li>Mon–Fri, 9am–6pm ET</li>
-            <li>support@crithitgames.com</li>
+            <li>Demo store &mdash; no live support</li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/40">
-        © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
+      <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/40">
+        <p>
+          {SITE_NAME} is a portfolio demo project, not a real retailer. It is not affiliated with, endorsed by, or
+          sponsored by Wizards of the Coast, Nintendo, The Pokémon Company, Konami, Disney, Ravensburger, or Bandai.
+          Card names and images are trademarks and property of their respective owners and are shown for demonstration
+          only, sourced from public community APIs (Scryfall, Pokémon TCG API, YGOPRODeck, Lorcast, OPTCG API).
+        </p>
+        <p className="mt-2">© {new Date().getFullYear()} {SITE_NAME} demo.</p>
       </div>
     </footer>
   );

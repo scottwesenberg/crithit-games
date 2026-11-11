@@ -1,9 +1,11 @@
+import { assertAdmin } from "@/lib/adminGuard";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  await assertAdmin();
   const [cardCount, orderCount, lowStock, pendingOrders] = await Promise.all([
     prisma.card.count(),
     prisma.order.count(),

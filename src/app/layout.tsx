@@ -5,6 +5,7 @@ import { CartProvider } from "@/components/cart/CartProvider";
 import CartDrawer from "@/components/cart/CartDrawer";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import DemoBanner from "@/components/layout/DemoBanner";
 import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionProviderWrapper>
           <CartProvider>
+            <DemoBanner />
             <Navbar />
             <main className="min-h-[60vh]">{children}</main>
             <Footer />

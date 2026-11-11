@@ -1,3 +1,4 @@
+import { assertAdmin } from "@/lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/utils";
 import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
@@ -5,6 +6,7 @@ import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
+  await assertAdmin();
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,

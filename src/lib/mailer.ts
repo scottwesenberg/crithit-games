@@ -18,6 +18,11 @@ function getTransport() {
   });
 }
 
+/** True when SMTP credentials are set. When false the app runs in "demo mode": no emails are sent and new accounts are auto-verified. */
+export function isEmailConfigured() {
+  return getTransport() !== null;
+}
+
 async function send(to: string, subject: string, html: string) {
   const transport = getTransport();
   const from = process.env.EMAIL_FROM ?? "CritHit Games <no-reply@crithitgames.com>";

@@ -1,3 +1,4 @@
+import { assertAdmin } from "@/lib/adminGuard";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import CardForm, { type CardFormInitial } from "@/components/admin/CardForm";
@@ -5,6 +6,7 @@ import CardForm, { type CardFormInitial } from "@/components/admin/CardForm";
 export const dynamic = "force-dynamic";
 
 export default async function EditCardPage({ params }: { params: { id: string } }) {
+  await assertAdmin();
   const card = await prisma.card.findUnique({
     where: { id: params.id },
     include: { set: { include: { game: true } }, variants: true },

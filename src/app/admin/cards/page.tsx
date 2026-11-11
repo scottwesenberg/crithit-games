@@ -1,3 +1,4 @@
+import { assertAdmin } from "@/lib/adminGuard";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/utils";
@@ -6,6 +7,7 @@ import Pagination from "@/components/catalog/Pagination";
 export const dynamic = "force-dynamic";
 
 export default async function AdminCardsPage({ searchParams }: { searchParams: { q?: string; page?: string } }) {
+  await assertAdmin();
   const page = Math.max(1, Number(searchParams.page) || 1);
   const pageSize = 30;
   const where = searchParams.q ? { name: { contains: searchParams.q, mode: "insensitive" as const } } : {};
