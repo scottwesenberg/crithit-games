@@ -66,6 +66,19 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   );
 }
 
+export async function sendTwoFactorCodeEmail(to: string, code: string) {
+  await send(
+    to,
+    `Your CritHit Games security code: ${code}`,
+    `<div style="font-family:sans-serif;max-width:480px;margin:auto">
+      <h2>Your security code</h2>
+      <p style="font-size:32px;letter-spacing:6px;font-weight:700;margin:16px 0">${code}</p>
+      <p>Enter this code to finish signing in. It expires in 10 minutes.</p>
+      <p>If you didn't try to sign in, someone may know your password &mdash; please change it.</p>
+    </div>`
+  );
+}
+
 export async function sendOrderConfirmationEmail(to: string, orderNumber: string, totalCents: number) {
   await send(
     to,

@@ -9,6 +9,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           <Link href="/account/orders" className="rounded-lg px-3 py-2 hover:bg-black/5">Order history</Link>
           <Link href="/account/addresses" className="rounded-lg px-3 py-2 hover:bg-black/5">Addresses</Link>
           <Link href="/account/profile" className="rounded-lg px-3 py-2 hover:bg-black/5">Profile</Link>
+          <Link href="/account/security" className="rounded-lg px-3 py-2 hover:bg-black/5">Security</Link>
         </nav>
       </aside>
       <div>{children}</div>

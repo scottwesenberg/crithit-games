@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { clientIp, rateLimit, resetRateLimit } from "@/lib/rateLimit";
+import { hasTwoFactor, verifySecondFactor } from "@/lib/twoFactor";
 
 export const authOptions: AuthOptions = {
   session: { strategy: "jwt" },
@@ -15,6 +16,7 @@ export const authOptions: AuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        code: { label: "Verification code", type: "text" },
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
@@ -43,6 +45,20 @@ export const authOptions: AuthOptions = {
 
         if (!user.emailVerified) {
           throw new Error("Please verify your email before signing in.");
+        }
+
+        // Second factor: if the account has 2FA on, a valid code is mandatory. The login form calls
+        // /api/2fa/challenge first to learn this and to have an emailed code sent when needed.
+        if (hasTwoFactor(user)) {
+          const code = credentials.code?.trim();
+          if (!code) throw new Error("Enter your verification code.");
+          const codeGate = rateLimit(`login:2fa:${user.id}`, 10, 15 * 60_000);
+          if (!codeGate.ok) {
+            throw new Error("Too many attempts. Please wait a few minutes and try again.");
+          }
+          const ok = await verifySecondFactor(user, code);
+          if (!ok) throw new Error("That code is invalid or has expired.");
+          resetRateLimit(`login:2fa:${user.id}`);
         }
 
         resetRateLimit(`login:acct:${email}`);
