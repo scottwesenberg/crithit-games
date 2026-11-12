@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import PasswordInput from "@/components/ui/PasswordInput";
 import { useSearchParams, useRouter } from "next/navigation";
 
 function ResetPasswordForm() {
@@ -47,11 +48,10 @@ function ResetPasswordForm() {
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <div>
         <label className="label">New password</label>
-        <input
-          type="password"
+        <PasswordInput
           required
           minLength={8}
-          className="input"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />

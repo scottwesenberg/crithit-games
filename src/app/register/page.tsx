@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -71,11 +72,10 @@ export default function RegisterPage() {
         </div>
         <div>
           <label className="label">Password</label>
-          <input
-            type="password"
+          <PasswordInput
             required
             minLength={8}
-            className="input"
+            autoComplete="new-password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />

@@ -3,12 +3,11 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/account";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,13 +19,22 @@ function LoginForm() {
     setError(null);
     setLoading(true);
     const res = await signIn("credentials", { email, password, redirect: false });
-    setLoading(false);
     if (res?.error) {
+      setLoading(false);
       setError(res.error);
       return;
     }
-    router.push(callbackUrl);
-    router.refresh();
+    // Full page navigation so the app reloads with the new session cookie. (A client-side router.push can
+    // land on a cached signed-out redirect, which is why the first click used to seem to do nothing.)
+    // Only same-site destinations are honored.
+    let destination = "/account";
+    try {
+      const target = new URL(searchParams.get("callbackUrl") ?? "/account", window.location.origin);
+      if (target.origin === window.location.origin) destination = target.pathname + target.search;
+    } catch {
+      // fall back to /account
+    }
+    window.location.assign(destination);
   }
 
   return (
@@ -39,10 +47,9 @@ function LoginForm() {
       </div>
       <div>
         <label className="label">Password</label>
-        <input
-          type="password"
+        <PasswordInput
           required
-          className="input"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
