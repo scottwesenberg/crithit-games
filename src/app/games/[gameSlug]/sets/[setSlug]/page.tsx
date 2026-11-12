@@ -10,20 +10,19 @@ import Pagination from "@/components/catalog/Pagination";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { gameSlug: string; setSlug: string } }) {
+export async function generateMetadata(props: { params: Promise<{ gameSlug: string; setSlug: string }> }) {
+  const params = await props.params;
   const set = await prisma.cardSet.findFirst({
     where: { slug: params.setSlug, game: { slug: params.gameSlug } },
   });
   return { title: set ? set.name : "Set not found" };
 }
 
-export default async function SetBrowsePage({
-  params,
-  searchParams,
-}: {
-  params: { gameSlug: string; setSlug: string };
-  searchParams: CatalogSearchParams;
+export default async function SetBrowsePage(props: {
+  params: Promise<{ gameSlug: string; setSlug: string }>;
+  searchParams: Promise<CatalogSearchParams>;
 }) {
+  const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
   const set = await prisma.cardSet.findFirst({
     where: { slug: params.setSlug, game: { slug: params.gameSlug } },
     include: { game: true },

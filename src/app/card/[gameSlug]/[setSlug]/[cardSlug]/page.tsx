@@ -20,20 +20,18 @@ async function getCard(gameSlug: string, setSlug: string, cardSlug: string) {
   });
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { gameSlug: string; setSlug: string; cardSlug: string };
+export async function generateMetadata(props: {
+  params: Promise<{ gameSlug: string; setSlug: string; cardSlug: string }>;
 }) {
+  const params = await props.params;
   const card = await getCard(params.gameSlug, params.setSlug, params.cardSlug);
   return { title: card ? `${card.name} — ${card.set.name}` : "Card not found" };
 }
 
-export default async function CardDetailPage({
-  params,
-}: {
-  params: { gameSlug: string; setSlug: string; cardSlug: string };
+export default async function CardDetailPage(props: {
+  params: Promise<{ gameSlug: string; setSlug: string; cardSlug: string }>;
 }) {
+  const params = await props.params;
   const card = await getCard(params.gameSlug, params.setSlug, params.cardSlug);
   if (!card) notFound();
 

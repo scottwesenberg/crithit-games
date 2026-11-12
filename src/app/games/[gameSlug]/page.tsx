@@ -10,18 +10,17 @@ import Pagination from "@/components/catalog/Pagination";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { gameSlug: string } }) {
+export async function generateMetadata(props: { params: Promise<{ gameSlug: string }> }) {
+  const params = await props.params;
   const game = await prisma.game.findUnique({ where: { slug: params.gameSlug } });
   return { title: game ? game.name : "Game not found" };
 }
 
-export default async function GameBrowsePage({
-  params,
-  searchParams,
-}: {
-  params: { gameSlug: string };
-  searchParams: CatalogSearchParams;
+export default async function GameBrowsePage(props: {
+  params: Promise<{ gameSlug: string }>;
+  searchParams: Promise<CatalogSearchParams>;
 }) {
+  const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
   const game = await prisma.game.findUnique({ where: { slug: params.gameSlug } });
   if (!game) notFound();
 

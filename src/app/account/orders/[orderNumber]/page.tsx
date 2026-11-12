@@ -7,7 +7,8 @@ import { conditionLabel, ORDER_STATUS_LABELS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-export default async function OrderDetailPage({ params }: { params: { orderNumber: string } }) {
+export default async function OrderDetailPage(props: { params: Promise<{ orderNumber: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session) return null;
 

@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 import { useCart } from "@/components/cart/CartProvider";
 
 export default function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: { order?: string };
+  searchParams: Promise<{ order?: string }>;
 }) {
+  const { order } = use(searchParams);
   const { clear } = useCart();
 
   useEffect(() => {
@@ -21,8 +22,8 @@ export default function CheckoutSuccessPage({
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">✓</div>
       <h1 className="text-2xl font-extrabold">Order confirmed!</h1>
       <p className="max-w-md text-black/60">
-        {searchParams.order
-          ? `Order ${searchParams.order} is confirmed. A receipt is on its way to your inbox.`
+        {order
+          ? `Order ${order} is confirmed. A receipt is on its way to your inbox.`
           : "Your payment went through and your order is confirmed."}
       </p>
       <div className="mt-2 flex gap-3">

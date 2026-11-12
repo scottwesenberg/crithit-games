@@ -8,7 +8,8 @@ import Pagination from "@/components/catalog/Pagination";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Search" };
 
-export default async function SearchPage({ searchParams }: { searchParams: CatalogSearchParams }) {
+export default async function SearchPage(props: { searchParams: Promise<CatalogSearchParams> }) {
+  const searchParams = await props.searchParams;
   const [{ items, page, totalPages, total }, options] = await Promise.all([
     queryCatalog(searchParams, {}),
     getFilterOptions({}),

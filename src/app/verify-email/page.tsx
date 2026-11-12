@@ -15,7 +15,8 @@ const COPY: Record<string, { title: string; body: string }> = {
   },
 };
 
-export default function VerifyEmailPage({ searchParams }: { searchParams: { status?: string } }) {
+export default async function VerifyEmailPage(props: { searchParams: Promise<{ status?: string }> }) {
+  const searchParams = await props.searchParams;
   const copy = COPY[searchParams.status ?? ""] ?? {
     title: "Verify your email",
     body: "Check your inbox for a verification link to activate your account.",
