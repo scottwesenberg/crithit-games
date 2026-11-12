@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/components/cart/CartProvider";
+import SearchBar from "@/components/layout/SearchBar";
 
 const GAME_LINKS = [
   { name: "Magic: The Gathering", slug: "magic-the-gathering" },
@@ -15,7 +16,6 @@ const GAME_LINKS = [
 export default function Navbar() {
   const { data: session } = useSession();
   const { itemCount, open } = useCart();
-  const [query, setQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -26,16 +26,11 @@ export default function Navbar() {
           <img src="/logo-full.svg" alt="CritHit Games" className="h-9 w-auto" />
         </Link>
 
-        <form action="/search" className="hidden flex-1 max-w-xl md:block">
-          <input
-            type="search"
-            name="q"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search cards, sets, or products…"
-            className="input"
-          />
-        </form>
+        <div className="hidden flex-1 max-w-xl md:block">
+          <Suspense fallback={<input type="search" disabled placeholder="Search cards, sets, or products…" className="input" />}>
+            <SearchBar placeholder="Search cards, sets, or products…" />
+          </Suspense>
+        </div>
 
         <nav className="ml-auto hidden items-center gap-5 text-sm font-medium lg:flex">
           {GAME_LINKS.map((g) => (
@@ -95,9 +90,9 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="border-t border-black/5 lg:hidden">
           <div className="container-page flex flex-col gap-3 py-4 text-sm font-medium">
-            <form action="/search">
-              <input type="search" name="q" placeholder="Search…" className="input" />
-            </form>
+            <Suspense fallback={<input type="search" disabled placeholder="Search…" className="input" />}>
+              <SearchBar placeholder="Search…" onSubmitted={() => setMobileOpen(false)} />
+            </Suspense>
             {GAME_LINKS.map((g) => (
               <Link key={g.slug} href={`/games/${g.slug}`} onClick={() => setMobileOpen(false)}>
                 {g.name}
