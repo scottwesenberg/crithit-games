@@ -204,7 +204,15 @@ export async function verifyTotpForUser(
   code: string
 ): Promise<boolean> {
   if (!user.totpSecretEnc) return false;
-  const step = matchTotpStep(decryptSecret(user.totpSecretEnc), code);
+  let secret: string;
+  try {
+    secret = decryptSecret(user.totpSecretEnc);
+  } catch {
+    // The secret was encrypted with a different NEXTAUTH_SECRET / TOTP_ENCRYPTION_KEY than this server has.
+    console.error("[2fa] could not decrypt a stored TOTP secret — is the encryption key the same in every environment?");
+    return false;
+  }
+  const step = matchTotpStep(secret, code);
   if (step === null) return false;
   const claimed = await prisma.user.updateMany({
     where: { id: user.id, OR: [{ totpLastStep: null }, { totpLastStep: { lt: step } }] },

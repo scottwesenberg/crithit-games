@@ -84,7 +84,13 @@ export async function POST(req: Request) {
 
     case "totp-enable": {
       if (user.totpEnabled || !user.totpSecretEnc) return fail("Start the authenticator setup first.");
-      const step = matchTotpStep(decryptSecret(user.totpSecretEnc), body.code.replace(/\s/g, ""));
+      let secret: string;
+      try {
+        secret = decryptSecret(user.totpSecretEnc);
+      } catch {
+        return fail("Setup expired. Please start the authenticator setup again.");
+      }
+      const step = matchTotpStep(secret, body.code.replace(/\s/g, ""));
       if (step === null) return fail("That code didn't match. Check your app and try again.");
       await prisma.user.update({ where: { id: user.id }, data: { totpEnabled: true, totpLastStep: step } });
       return NextResponse.json({ ok: true, recoveryCodes: await firstTimeRecoveryCodes() });
