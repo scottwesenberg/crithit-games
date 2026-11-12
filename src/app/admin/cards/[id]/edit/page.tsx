@@ -5,7 +5,8 @@ import CardForm, { type CardFormInitial } from "@/components/admin/CardForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function EditCardPage({ params }: { params: { id: string } }) {
+export default async function EditCardPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await assertAdmin();
   const card = await prisma.card.findUnique({
     where: { id: params.id },

@@ -7,7 +7,8 @@ const schema = z.object({
   status: z.enum(["PENDING_PAYMENT", "PAID", "FULFILLED", "CANCELED", "REFUNDED"]),
 });
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 

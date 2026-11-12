@@ -6,9 +6,6 @@ const nextConfig = {
     unoptimized: true,
     remotePatterns: [],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   async headers() {
     return [
       {

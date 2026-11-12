@@ -50,7 +50,7 @@ export const cardSchema = z.object({
   subType: z.string().max(80).optional().or(z.literal("")),
   description: z.string().max(2000).optional().or(z.literal("")),
   imageUrl: z.string().url().optional().or(z.literal("")),
-  variants: z.array(cardVariantSchema).min(1, "Add at least one variant"),
+  variants: z.array(cardVariantSchema).min(1, "Add at least one variant").max(100),
 });
 
 export const checkoutItemSchema = z.object({
@@ -59,6 +59,6 @@ export const checkoutItemSchema = z.object({
 });
 
 export const checkoutSchema = z.object({
-  items: z.array(checkoutItemSchema).min(1),
+  items: z.array(checkoutItemSchema).min(1).max(100),
   addressId: z.string().optional(),
 });

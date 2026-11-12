@@ -6,7 +6,8 @@ import Pagination from "@/components/catalog/Pagination";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminCardsPage({ searchParams }: { searchParams: { q?: string; page?: string } }) {
+export default async function AdminCardsPage(props: { searchParams: Promise<{ q?: string; page?: string }> }) {
+  const searchParams = await props.searchParams;
   await assertAdmin();
   const page = Math.max(1, Number(searchParams.page) || 1);
   const pageSize = 30;
