@@ -27,11 +27,44 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
+  // Two-factor authentication. The TOTP secret is stored AES-256-GCM encrypted (see src/lib/twoFactor.ts).
+  totpSecretEnc   String?
+  totpEnabled     Boolean   @default(false)
+  totpLastStep    Int?
+  emailOtpEnabled Boolean   @default(false)
+
   addresses       Address[]
+  recoveryCodes   RecoveryCode[]
+  loginCodes      LoginCode[]
   orders          Order[]
   verificationTokens EmailVerificationToken[]
   passwordResetTokens PasswordResetToken[]
   csvImportBatches CsvImportBatch[]
+}
+
+/// One-time backup codes for 2FA (stored hashed; each works once).
+model RecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+/// Short-lived emailed 6-digit codes (stored hashed) used for email 2FA at sign-in and when enabling it.
+model LoginCode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Address {

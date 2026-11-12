@@ -32,6 +32,10 @@ API, YGOPRODeck, Lorcast, OPTCG API) with prices taken from those sources.
   publisher. Without Stripe keys, checkout returns a friendly "turned off in this demo" message. Hide the banner with `NEXT_PUBLIC_DEMO_BANNER=false`.
 - **Email.** If no SMTP credentials are configured, the app runs in demo mode: no emails are sent and new accounts are
   verified immediately. Set the `EMAIL_SERVER_*` variables to switch on real verification and reset emails.
+- **Two-step verification (2FA).** Every account can turn on an authenticator app (TOTP) and/or emailed codes from
+  Account → Security, and gets one-time recovery codes. It is **required for the admin account**: admins can sign in
+  but the admin area stays locked until a method is enabled. Secrets are AES-256-GCM encrypted at rest, codes are
+  rate-limited, and authenticator codes can't be replayed. Email codes need the `EMAIL_SERVER_*` variables.
 - **No seeded accounts in production.** The demo customer is created only in local development; production seeding
   requires a unique `SEED_ADMIN_PASSWORD`. `npm run db:remove-demo` removes demo data from any database.
 - **Rate limiting** on sign-in, registration, password reset, and checkout (`src/lib/rateLimit.ts`). It is in-memory
@@ -44,7 +48,7 @@ API, YGOPRODeck, Lorcast, OPTCG API) with prices taken from those sources.
 
 ## Tech stack
 
-- **Next.js 14** (App Router) + **TypeScript** + **Tailwind CSS**
+- **Next.js 16** (App Router) + **TypeScript** + **Tailwind CSS**
 - **PostgreSQL** via **Prisma ORM**
 - **NextAuth (Auth.js) v4** — email/password accounts with a custom email-verification flow (Credentials
   provider, JWT sessions; sign-in is blocked until the address is verified)
